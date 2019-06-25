@@ -7,4 +7,4 @@
 #SBATCH -t 5
 #SBATCH --reservation=Summerschool
 
-
+aprun prog

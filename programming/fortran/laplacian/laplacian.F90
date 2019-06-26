@@ -12,8 +12,10 @@ program laplacian
   ! Grid spacing
   dx = 1.0/real(nx-1)
   dy = 1.0/real(ny-1)
-  ! TODO: allocate matrices
 
+  ! TODO: allocate matrices
+  allocate (A(nx, ny))
+  allocate (L(nx, ny))
 
   ! initialize array A(x,y) = (x^2 + y^2) in the domain [0:1,0:1]
   y = 0.0
@@ -27,14 +29,24 @@ program laplacian
   end do
 
   ! TODO: Compute Laplacian of A and save it to array L
-
+  L = 0.0
+  do j = 2, ny-1
+     do i = 2, nx-1
+        L(i,j) = (A(i-1,j) - 2*A(i,j) + A(i+1,j)) / (dx)**2 &
+			+ (A(i,j-1) - 2*A(i,j) + A(i,j+1)) / (dy)**2
+     end do
+  end do
 
   ! TODO: Printing of the arrays
   write(*,*) "Original array:"
-
+  do i = 1, nx
+     write(*, '(12F6.1)') A(i,:)
+  end do
 
   write(*,*) "Laplacian of the array:"
-
+  do i = 1, nx
+     write(*, '(12F6.1)') L(i,:)
+  end do
 
   ! Analytically, the Laplacian of the function is nabla^2 A(x,y) = 4
 

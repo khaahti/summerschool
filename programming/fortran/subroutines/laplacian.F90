@@ -60,7 +60,7 @@ contains
       ! TODO: write a subroutine that prints "array" on screen
 	  write(*,*) "Array:"
 	  do i = 1, size(array, dim=1)
-		 write(*, '(12F6.1)') array(i,:)
+		 write(*, '(10F6.3)') array(i,:)
 	  end do
   end subroutine write_field
 

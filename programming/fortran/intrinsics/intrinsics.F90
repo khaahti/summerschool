@@ -31,14 +31,15 @@ program intrinsics
   ! TODO:
   ! Using array intrinsics to get information from array A
 
-  write (*,*) 'a) Sum of elements across 2nd dimension of A: ', ! ..
+  write (*,*) 'a) Sum of elements across 2nd dimension of A: '
+  write(*,'(*(F6.1))') sum(A, dim=2)
 
-  write (*,*) 'b) Coordinates of maximum element: ', !
+  write (*,*) 'b) Coordinates of maximum element: ', maxloc(A)
 
-  write (*,*) 'c) Absolute minimum value: ', !
+  write (*,*) 'c) Absolute minimum value: ', minval(abs(A))
 
-  write (*,*) 'd) Are elements of A greater than or equal to 0: ', !
+  write (*,*) 'd) Are elements of A greater than or equal to 0: ', all(A >= 0)
 
-  write (*,*) 'e) Number of elements greater than or equal to 0.5: ', !
+  write (*,*) 'e) Number of elements greater than or equal to 0.5: ', count(A >= 0.5)
 
 end program intrinsics

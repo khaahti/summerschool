@@ -6,7 +6,7 @@ COMMONDIR=../../../../heat/common
 LIBPNGDIR=/appl/opt/libpng
 
 ifeq ($(COMP),cray)
-FC=ftn
+FC=gfortran
 CC=cc
 FCFLAGS=-O3 
 CCFLAGS=-O3 -I$(LIBPNGDIR)/include -I$(COMMONDIR)

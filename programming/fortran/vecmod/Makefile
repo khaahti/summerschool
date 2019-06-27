@@ -4,7 +4,7 @@ endif
 
 ifeq ($(COMP),cray)
 CC=cc
-FC=ftn 
+FC=gfortran
 FCFLAGS=-efmw -hcpu=sandybridge
 endif
 

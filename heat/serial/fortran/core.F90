@@ -31,12 +31,6 @@ contains
 		end do
 	end do
 	
-	! boundaries
-	curr%data(1:nx,   0     ) = curr%data(1:nx, 1     )
-    	curr%data(1:nx,     ny+1) = curr%data(1:nx,   ny  )
-    	curr%data(0,      0:ny+1) = curr%data(1,    0:ny+1)
-    	curr%data(  nx+1, 0:ny+1) = curr%data(  nx, 0:ny+1)
-	
   end subroutine evolve
 
 end module core

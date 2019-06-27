@@ -23,13 +23,19 @@ contains
 
     ! TODO: implement the heat equation update
 	! mid section
-	do j = 2, ny+1
-		do i = 2, nx+1
+	do j = 1, ny
+		do i = 1, nx
 			curr%data(i,j) = prev%data(i,j) + dt * a &
-				* (prev%data(i-1,j) - 2*prev%data(i,j) + prev%data(i+1,j))/(curr%dx)**2 &
-				+ (prev%data(i,j-1) - 2*prev%data(i,j) + prev%data(i,j+1))/(curr%dy)**2
+				* ((prev%data(i-1,j) - 2*prev%data(i,j) + prev%data(i+1,j))/(curr%dx)**2 &
+				+ (prev%data(i,j-1) - 2*prev%data(i,j) + prev%data(i,j+1))/(curr%dy)**2)
 		end do
 	end do
+	
+	! boundaries
+	curr%data(1:nx,   0     ) = curr%data(1:nx, 1     )
+    	curr%data(1:nx,     ny+1) = curr%data(1:nx,   ny  )
+    	curr%data(0,      0:ny+1) = curr%data(1,    0:ny+1)
+    	curr%data(  nx+1, 0:ny+1) = curr%data(  nx, 0:ny+1)
 	
   end subroutine evolve
 

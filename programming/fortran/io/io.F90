@@ -16,7 +16,9 @@ contains
 	open(10, file=filename, status='old')
 	
     ! read the first header line to get nx and ny (header format "# nx ny"
-	read(10, fmt='(2x,i4,1x,i4)') nx, ny
+	read(10, fmt='(2x,i4,i4)') nx, ny
+	write(*,*) nx
+	write(*,*) ny
 	
     ! allocate matrix called field
 	allocate(field(nx,ny))

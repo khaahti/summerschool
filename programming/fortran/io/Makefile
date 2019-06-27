@@ -2,11 +2,11 @@ ifeq ($(COMP),)
 COMP=cray
 endif
 
-COMMONDIR=../../../../heat/common
+COMMONDIR=../../../heat/common
 LIBPNGDIR=/appl/opt/libpng
 
 ifeq ($(COMP),cray)
-FC=gfortran
+FC=ftn
 CC=cc
 FCFLAGS=-O3 
 CCFLAGS=-O3 -I$(LIBPNGDIR)/include -I$(COMMONDIR)

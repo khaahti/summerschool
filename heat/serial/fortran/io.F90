@@ -49,13 +49,14 @@ contains
 
     integer :: nx, ny, i
     character(len=2) :: dummy
+    character(len=100) :: line
 
     ! TODO: implement the file reading
 	! open the file
 	open(10, file=filename, status='old')
 	
     ! read the first header line to get nx and ny (header format "# nx ny"
-	read(10, fmt='(2x,i4,i4)') nx, ny
+	read(10, *) dummy, nx, ny
 
     ! Initialize the field metadata (nx, ny, dx, dy). You can use
     ! the utilite routine set_field_dimensions from module heat

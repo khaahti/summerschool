@@ -30,7 +30,7 @@ contains
 				+ (prev%data(i,j-1) - 2*prev%data(i,j) + prev%data(i,j+1))/(curr%dy)**2)
 		end do
 	end do
-	
+
   end subroutine evolve
 
 end module core

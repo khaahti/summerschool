@@ -32,6 +32,7 @@ contains
     case(1) ! One argument -> input file name
        using_input_file = .true.
        call get_command_argument(1, input_file)
+       write(*,*) input_file
     case(2) ! Two arguments -> input file name and number of steps
        using_input_file = .true.
        call get_command_argument(1, input_file)
@@ -86,29 +87,29 @@ contains
           ds2 = int((i - field0%nx / 2.0_dp + 1)**2 + &
                & (j - field0%ny / 2.0_dp + 1)**2)
           if (ds2 < radius2) then
-             field0%data(i,j) = 5.0_dp
+             field0%data(i,j) = 100.0_dp
           else
-             field0%data(i,j) = 65.0_dp
+             field0%data(i,j) = 10.0_dp
           end if
        end do
     end do
 
     ! Boundary conditions
-    do j = 0, field0%nx + 1
-       field0%data(j, 0) = 20.0_dp
-    end do
+!    do j = 0, field0%nx + 1
+!       field0%data(j, 0) = 20.0_dp
+!    end do
 
-    do j = 0, field0%nx + 1
-       field0%data(j, field0%ny + 1) = 70.0_dp
-    end do
+!    do j = 0, field0%nx + 1
+!       field0%data(j, field0%ny + 1) = 70.0_dp
+!    end do
 
-    do j = 0, field0%ny + 1
-       field0%data(0, j) = 85.0_dp
-    end do
+!    do j = 0, field0%ny + 1
+!       field0%data(0, j) = 85.0_dp
+!    end do
 
-    do j = 0, field0%ny+1
-       field0%data(field0%nx + 1, j) = 5.0_dp
-    end do
+!    do j = 0, field0%ny+1
+!       field0%data(field0%nx + 1, j) = 5.0_dp
+!    end do
   end subroutine generate_field
 
 

@@ -9,16 +9,16 @@ program heat_solve
 
   implicit none
 
-  real(dp), parameter :: a = 0.5 ! Diffusion constant
-  type(field) :: current, previous    ! Current and previus temperature fields
+  real(dp), parameter :: a = 0.5  ! Diffusion constant
+  type(field) :: current, previous  ! Current and previus temperature fields
 
-  real(dp) :: dt     ! Time step
-  integer :: nsteps       ! Number of time steps
-  integer, parameter :: image_interval = 10 ! Image output interval
+  real(dp) :: dt  ! Time step
+  integer :: nsteps  ! Number of time steps
+  integer, parameter :: image_interval = 10  ! Image output interval
 
   integer :: iter
 
-  real :: start, stop ! Timers
+  real :: start, stop  ! Timers
 
   call initialize(current, previous, nsteps)
 

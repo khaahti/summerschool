@@ -3,7 +3,7 @@ program basic
   use iso_fortran_env, only : REAL64
 
   implicit none
-  integer, parameter :: msgsize = 10000
+  integer, parameter :: msgsize = 10000000
   integer :: rc, myid, myidleft, myidrigth, ntasks
   integer :: message(msgsize)
   integer :: receiveBuffer(msgsize)
@@ -33,23 +33,16 @@ program basic
     myidleft = MPI_PROC_NULL
   end if
 
-  ! ensin parittomille parillisille
-  if (mod(myid,2) == 0) then
-    call mpi_recv(receiveBuffer, msgsize, MPI_INTEGER, myidleft, myid, &
+! with sendrecv
+  call mpi_sendrecv(message, msgsize, MPI_INTEGER, myidrigth, &
+	myid + 1, receiveBuffer, msgsize, MPI_INTEGER, myidleft, myid, &
 	MPI_COMM_WORLD, status)
-  else
-    call mpi_send(message, msgsize, MPI_INTEGER, myidrigth, myid + 1, &
-	MPI_COMM_WORLD)
-  end if
 
-  ! sitten parillisilta parittomille
-  if (mod(myid,2) == 1) then
-    call mpi_recv(receiveBuffer, msgsize, MPI_INTEGER, myidleft, myid, &
- 	MPI_COMM_WORLD, status)
-  else
-    call mpi_send(message, msgsize, MPI_INTEGER, myidrigth, myid + 1, &
-	MPI_COMM_WORLD)
-  end if
+! with recv and send
+!  call mpi_recv(receiveBuffer, msgsize, MPI_INTEGER, myidleft, myid, &
+! 	MPI_COMM_WORLD, status)
+!  call mpi_send(message, msgsize, MPI_INTEGER, myidrigth, myid + 1, &
+!	MPI_COMM_WORLD)
 
   if (myid < ntasks-1) then
      write(*,'(A10,I3,A20,I8,A,I3,A,I3)') 'Sender: ', myid, &

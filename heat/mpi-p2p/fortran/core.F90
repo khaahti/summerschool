@@ -12,14 +12,22 @@ contains
 
     type(field), intent(inout) :: field0
     type(parallel_data), intent(in) :: parallel
+    type(mpi_status) :: status
 
     integer :: ierr
 
     ! TODO start: implement halo exchange
-    ! Send to left, receive from right
+    ! Send to left, receive from righta
+    call mpi_sendrecv(field0%data(1,1:field0%ny), field0%ny, MPI_REAL, &
+	parallel%nleft, parallel%nleft, &
+	field0%data(field0%nx+1,1:field0%ny),field0%ny, MPI_REAL, &
+	parallel%nright, parallel%rank, MPI_COMM_WORLD, status) 
 
     ! Send to right, receive from left
-
+    call mpi_sendrecv(field0%data(field0%nx,1:field0%ny), field0%ny, MPI_REAL, &
+	parallel%nleft, parallel%nright, field0%data(0,1:field0%ny), &
+	field0%ny, MPI_REAL, parallel%nleft, parallel%rank, &	
+	MPI_COMM_WORLD, status)
     ! TODO end
 
   end subroutine exchange

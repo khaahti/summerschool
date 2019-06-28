@@ -17,18 +17,20 @@ program exchange
   ! TODO: Implement sending and receiving as defined in the assignment
   ! sending and receiving from 0 to 1
   if (myid == 0) then
-    call mpi_send(message, msgsize, MPI_INTEGER, 1, 10, MPI_COMM_WORLD, rc)
-  else if (myid == 1) then
-    call mpi_recv(receiveBuffer, msgsize, MPI_INTEGER, 0, 10, &
+    call mpi_recv(message, msgsize, MPI_INTEGER, 1, 10, &
 	MPI_COMM_WORLD, status, rc)
+  else if (myid == 1) then
+    call mpi_send(receiveBuffer, msgsize, MPI_INTEGER, 0, 10, &
+	MPI_COMM_WORLD, rc)
   end if
 
   ! sending and receiving from 1 to 0
   if (myid == 1) then
-    call mpi_send(message, msgsize, MPI_INTEGER, 0, 10, MPI_COMM_WORLD, rc)
-  else if (myid == 0) then
-    call mpi_recv(receiveBuffer, msgsize, MPI_INTEGER, 1, 10, &
+    call mpi_recv(message, msgsize, MPI_INTEGER, 0, 10, &
 	 MPI_COMM_WORLD, status, rc)
+  else if (myid == 0) then
+    call mpi_send(receiveBuffer, msgsize, MPI_INTEGER, 1, 10, &
+	 MPI_COMM_WORLD, rc)
   end if
 
   ! write results

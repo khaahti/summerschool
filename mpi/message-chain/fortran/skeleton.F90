@@ -3,8 +3,8 @@ program basic
   use iso_fortran_env, only : REAL64
 
   implicit none
-  integer, parameter :: msgsize = 10000000
-  integer :: rc, myid, ntasks
+  integer, parameter :: msgsize = 10000
+  integer :: rc, myid, myidleft, myidrigth, ntasks
   integer :: message(msgsize)
   integer :: receiveBuffer(msgsize)
   type(mpi_status) :: status
@@ -22,15 +22,42 @@ program basic
   t0 = mpi_wtime()
 
   ! TODO: Send and receive as defined in the assignment
-  if (myid < ntasks-1) then
 
+  ! id of neigthbourgs
+  myidleft = myid - 1
+  myidrigth = myid + 1
+  if (myidrigth >= ntasks) then
+    myidrigth = MPI_PROC_NULL
+  end if 
+  if (myidleft < 0) then
+    myidleft = MPI_PROC_NULL
+  end if
+
+  ! ensin parittomille parillisille
+  if (mod(myid,2) == 0) then
+    call mpi_recv(receiveBuffer, msgsize, MPI_INTEGER, myidleft, myid, &
+	MPI_COMM_WORLD, status)
+  else
+    call mpi_send(message, msgsize, MPI_INTEGER, myidrigth, myid + 1, &
+	MPI_COMM_WORLD)
+  end if
+
+  ! sitten parillisilta parittomille
+  if (mod(myid,2) == 1) then
+    call mpi_recv(receiveBuffer, msgsize, MPI_INTEGER, myidleft, myid, &
+ 	MPI_COMM_WORLD, status)
+  else
+    call mpi_send(message, msgsize, MPI_INTEGER, myidrigth, myid + 1, &
+	MPI_COMM_WORLD)
+  end if
+
+  if (myid < ntasks-1) then
      write(*,'(A10,I3,A20,I8,A,I3,A,I3)') 'Sender: ', myid, &
           ' Sent elements: ', msgsize, &
           '. Tag: ', myid+1, '. Receiver: ', myid+1
   end if
 
   if (myid > 0) then
-
      write(*,'(A10,I3,A,I3)') 'Receiver: ', myid, &
           ' First element: ', receiveBuffer(1)
   end if

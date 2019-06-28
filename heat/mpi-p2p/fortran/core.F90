@@ -17,17 +17,18 @@ contains
     integer :: ierr
 
     ! TODO start: implement halo exchange
-    ! Send to left, receive from righta
-    call mpi_sendrecv(field0%data(1,1:field0%ny), field0%ny, MPI_REAL, &
-	parallel%nleft, parallel%nleft, &
-	field0%data(field0%nx+1,1:field0%ny),field0%ny, MPI_REAL, &
-	parallel%nright, parallel%rank, MPI_COMM_WORLD, status) 
+    ! Send to left, receive from right 
+    call mpi_sendrecv(field0%data(:,1), field0%nx+2, MPI_DOUBLE_PRECISION, &
+	parallel%nleft, 999, &
+	field0%data(:,field0%ny+1),field0%nx+2, MPI_DOUBLE_PRECISION, &
+	parallel%nright, 999, MPI_COMM_WORLD, status, ierr) 
 
     ! Send to right, receive from left
-    call mpi_sendrecv(field0%data(field0%nx,1:field0%ny), field0%ny, MPI_REAL, &
-	parallel%nleft, parallel%nright, field0%data(0,1:field0%ny), &
-	field0%ny, MPI_REAL, parallel%nleft, parallel%rank, &	
-	MPI_COMM_WORLD, status)
+    call mpi_sendrecv(field0%data(:,field0%ny), field0%nx+2, &
+	MPI_DOUBLE_PRECISION, &
+	parallel%nright, 999, field0%data(:,0), &
+	field0%nx+2, MPI_DOUBLE_PRECISION, parallel%nleft, 999, &	
+	MPI_COMM_WORLD, status, ierr)
     ! TODO end
 
   end subroutine exchange

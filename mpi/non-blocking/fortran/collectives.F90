@@ -8,6 +8,7 @@ program coll_exer
   integer, dimension(2*n_mpi_tasks) :: sendbuf, recvbuf
   integer, dimension(2*n_mpi_tasks**2) :: printbuf
   integer, dimension(n_mpi_tasks) :: lengths, displs
+  type(mpi_request) :: request
 
   call mpi_init(ierr)
   call mpi_comm_size(MPI_COMM_WORLD, ntasks, ierr)
@@ -44,8 +45,10 @@ program coll_exer
 !	lengths, displs, MPI_INTEGER, 1, MPI_COMM_WORLD)
 
   ! d)
-  call mpi_alltoall(sendbuf, 2, MPI_INTEGER, recvbuf, &
-	2, MPI_INTEGER, MPI_COMM_WORLD)
+  call mpi_ialltoall(sendbuf, 2, MPI_INTEGER, recvbuf, &
+	2, MPI_INTEGER, MPI_COMM_WORLD, request)
+
+  call mpi_wait(request, MPI_STATUS_IGNORE)
 
   ! Print data that was received
   ! TODO: add correct buffer

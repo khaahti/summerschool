@@ -14,7 +14,28 @@ contains
     type(field), intent(inout) :: field0
     type(parallel_data), intent(inout) :: parallel
     integer :: ierr
+    type(mpi_request) :: request(4)
+    type(mpi_status) :: status(4)
+
     ! TODO
+    ! implement halo exchange
+
+    ! Send to left, receive from right
+    call mpi_irecv(field0%data(:,field0%ny+1),field0%nx+2, MPI_DOUBLE_PRECISION, &
+	parallel%nright, 999, MPI_COMM_WORLD, request(1)) 
+
+    call mpi_isend(field0%data(:,1), field0%nx+2, MPI_DOUBLE_PRECISION, &
+	parallel%nleft, 999, MPI_COMM_WORLD, request(2)) 
+
+    ! Send to right, receive from left
+    call mpi_irecv(field0%data(:,0), field0%nx+2, MPI_DOUBLE_PRECISION, &
+	parallel%nleft, 999, MPI_COMM_WORLD, requests)
+
+    call mpi_isend(field0%data(:,field0%ny), field0%nx+2, &
+	MPI_DOUBLE_PRECISION, parallel%nright, 999, MPI_COMM_WORLD, request(4))
+
+    ! TODO end
+
   end subroutine exchange_init
 
   ! Compute one time step of temperature evolution
@@ -34,6 +55,7 @@ contains
     ny = curr%ny
 
     ! TODO
+
   end subroutine evolve_interior
 
   ! Finalize the non-blocking communication

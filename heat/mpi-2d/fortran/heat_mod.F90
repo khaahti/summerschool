@@ -98,15 +98,19 @@ contains
 
     ! Create cartesian communicator based on dims variable. Store the communicator to the
     ! field "comm" of the parallel datatype (parallel%comm).
+    call mpi_cart_create(MPI_COMM_WORLD, 2, dims, [.false., .false.], &
+	 .false., parallel%comm) 
 
     ! Find the neighbouring MPI tasks (parallel%nup, parallel%ndown,
     !     parallel%nleft, parallel%nright) using MPI_Cart_shift
+    call mpi_cart_coords(parallel%comm, 
 
     ! Determine parallel%size and parallel%rank from newly created
     ! Cartesian comm
 
     ! Create datatypes for halo exchange
     !   Datatype for communication of rows (parallel%rowtype)
+
     !   Datatype for communication of columns (parallel%columntype)
 
     call mpi_type_commit(parallel%rowtype, ierr)

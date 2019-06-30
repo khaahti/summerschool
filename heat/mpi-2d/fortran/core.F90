@@ -5,7 +5,7 @@ module core
 contains
 
   ! Exchange the boundary data between MPI tasks
-  subroutine exchange(field0, parallel)
+  subroutine exchange_init(field0, parallel)
     use mpi_f08
 
     implicit none
@@ -47,10 +47,20 @@ contains
 	parallel%rowtype, parallel%ndown, 999, MPI_COMM_WORLD, &
 	parallel%requests(8))
 
-    call mpi_waitall(8, parallel%requests, status)
-    ! TODO end
+  end subroutine exchange_init
 
-  end subroutine exchange
+  ! Finalize the non-blocking communication
+  subroutine exchange_finalize(parallel)
+    use mpi_f08
+    implicit none
+    type(parallel_data), intent(inout) :: parallel
+    integer :: ierr
+    type(mpi_status) :: status(8) 
+
+    ! TODO
+    call mpi_waitall(8, parallel%requests, status)
+
+  end subroutine exchange_finalize 
 
   ! Compute one time step of temperature evolution
   ! Arguments:
@@ -58,7 +68,37 @@ contains
   !   prev (type(field)): values from previous time step
   !   a (real(dp)): update equation constant
   !   dt (real(dp)): time step value
-  subroutine evolve(curr, prev, a, dt)
+  ! Update only the border-independent part of the field
+  subroutine evolve_interior(curr, prev, a, dt)
+    implicit none
+    type(field), intent(inout) :: curr, prev
+    real(dp) :: a, dt
+    integer :: i, j, nx, ny
+
+    nx = curr%nx
+    ny = curr%ny
+
+    ! TODO
+    do j = 2, ny-1
+       do i = 2, nx-1
+          curr%data(i, j) = prev%data(i, j) + a * dt * &
+               & ((prev%data(i-1, j) - 2.0 * prev%data(i, j) + &
+               &   prev%data(i+1, j)) / curr%dx**2 + &
+               &  (prev%data(i, j-1) - 2.0 * prev%data(i, j) + &
+               &   prev%data(i, j+1)) / curr%dy**2)
+       end do
+    end do
+
+  end subroutine evolve_interior
+
+  ! Compute one time step of temperature evolution
+  ! Arguments:
+  !   curr (type(field)): current temperature values
+  !   prev (type(field)): values from previous time step
+  !   a (real(dp)): update equation constant
+  !   dt (real(dp)): time step value
+  ! Update only the border-dependent part
+  subroutine evolve_edges(curr, prev, a, dt)
 
     implicit none
 
@@ -69,7 +109,9 @@ contains
     nx = curr%nx
     ny = curr%ny
 
-    do j = 1, ny
+    ! TODO
+    ! left and right boundary
+    do j = 1, ny, ny - 1
        do i = 1, nx
           curr%data(i, j) = prev%data(i, j) + a * dt * &
                & ((prev%data(i-1, j) - 2.0 * prev%data(i, j) + &
@@ -78,6 +120,18 @@ contains
                &   prev%data(i, j+1)) / curr%dy**2)
        end do
     end do
-  end subroutine evolve
+
+    ! upper and lower boundary
+    do j = 1, ny
+       do i = 1, nx, nx - 1
+          curr%data(i, j) = prev%data(i, j) + a * dt * &
+               & ((prev%data(i-1, j) - 2.0 * prev%data(i, j) + &
+               &   prev%data(i+1, j)) / curr%dx**2 + &
+               &  (prev%data(i, j-1) - 2.0 * prev%data(i, j) + &
+               &   prev%data(i, j+1)) / curr%dy**2)
+       end do
+    end do
+
+  end subroutine evolve_edges
 
 end module core

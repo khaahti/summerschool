@@ -135,8 +135,8 @@ contains
        sizes(1) = nx
        sizes(2) = ny
     else
-       sizes(1) = nx_local
-       sizes(2) = ny_local
+       sizes(1) = nx_local + 2
+       sizes(2) = ny_local + 2
     end if
 
     ! TODO Fill in the correct parameters to mpi_type_create_subarray

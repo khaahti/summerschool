@@ -7,4 +7,4 @@
 #SBATCH -t 5
 #SBATCH --reservation=Summerschool
 
-aprun -n 4 heat_mpi bottle.dat 5000
+aprun -n 4 heat_mpi bottle.dat 1000

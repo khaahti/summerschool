@@ -22,6 +22,7 @@ module heat
      integer :: rank
      integer :: nup, ndown, nleft, nright  ! Ranks of neighbouring MPI tasks
      type(mpi_comm) :: comm
+     type(mpi_request) :: requests(8)
      type(mpi_datatype) :: rowtype         ! MPI Datatype for communication of rows
      type(mpi_datatype) :: columntype      ! MPI Datatype for communication of columns
      type(mpi_datatype) :: subarraytype    ! MPI Datatype for communication of inner region
@@ -99,7 +100,7 @@ contains
     ! Create cartesian communicator based on dims variable. Store the communicator to the
     ! field "comm" of the parallel datatype (parallel%comm).
     call mpi_cart_create(MPI_COMM_WORLD, 2, dims, [.false., .false.], &
-	 .false., parallel%comm) 
+	 .true., parallel%comm) 
 
     ! Find the neighbouring MPI tasks (parallel%nup, parallel%ndown,
     ! parallel%nleft, parallel%nright) using MPI_Cart_shift
@@ -109,14 +110,16 @@ contains
     ! Determine parallel%size and parallel%rank from newly created
     ! Cartesian comm
     call mpi_comm_size(parallel%comm, parallel%size, ierr)
-    call mpi_comm_rank(parallel%comm, parallel%rank, ierr
+    call mpi_comm_rank(parallel%comm, parallel%rank, ierr)
 
     ! Create datatypes for halo exchange
     !   Datatype for communication of rows (parallel%rowtype)
-    call mpi_type_vector(ny+2, 1, nx+2, MPI_INTEGER, parallel%rowtype, ierr)
+    call mpi_type_vector(ny_local+2, 1, nx_local+2, MPI_DOUBLE_PRECISION, &
+	parallel%rowtype, ierr)
 
     !   Datatype for communication of columns (parallel%columntype)
-    call mpi_type_vector(1, nx+2, ny+2, MPI_INTEGER, parallel%columntype, ierr)
+    call mpi_type_vector(1, nx_local+2, ny_local+2, MPI_DOUBLE_PRECISION, &
+	parallel%columntype, ierr)
 
     call mpi_type_commit(parallel%rowtype, ierr)
     call mpi_type_commit(parallel%columntype, ierr)
@@ -124,22 +127,22 @@ contains
     ! Create datatype for subblock needed in I/O
     !   Rank 0 uses datatype for receiving data into full array while
     !   other ranks use datatype for sending the inner part of array
-!    subsizes(1) = nx_local
-!    subsizes(2) = ny_local
-!    offsets(1) = 0
-!    offsets(2) = 0
-!    if (parallel%rank == 0) then
-!       sizes(1) = ! TODO
-!       sizes(2) = ! TODO
-!    else
-!       sizes(1) = ! TODO
-!       sizes(2) = ! TODO
-!    end if
+    subsizes(1) = nx_local
+    subsizes(2) = ny_local
+    offsets(1) = 0
+    offsets(2) = 0
+    if (parallel%rank == 0) then
+       sizes(1) = nx
+       sizes(2) = ny
+    else
+       sizes(1) = nx_local
+       sizes(2) = ny_local
+    end if
 
     ! TODO Fill in the correct parameters to mpi_type_create_subarray
-!    call mpi_type_create_subarray(, , , , , &
-!         , parallel%subarraytype, ierr)
-!    call mpi_type_commit(parallel%subarraytype, ierr)
+    call mpi_type_create_subarray(2, sizes, subsizes, offsets, MPI_ORDER_FORTRAN, &
+         MPI_DOUBLE_PRECISION, parallel%subarraytype, ierr)
+    call mpi_type_commit(parallel%subarraytype, ierr)
 
     ! TODO end
 

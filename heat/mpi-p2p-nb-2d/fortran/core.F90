@@ -18,19 +18,34 @@ contains
 
     ! TODO start: implement halo exchange
     ! Send to left, receive from right
-    call mpi_irecv(field0%data(:,field0%ny+1),field0%nx+2, MPI_DOUBLE_PRECISION, &
+    call mpi_irecv(field0%data(0,field0%ny+1), 1, parallel%columntype, &
 	parallel%nright, 999, MPI_COMM_WORLD, parallel%requests(1)) 
 
-    call mpi_isend(field0%data(:,1), field0%nx+2, MPI_DOUBLE_PRECISION, &
+    call mpi_isend(field0%data(0,1), 1, parallel%columntype, &
 	parallel%nleft, 999, MPI_COMM_WORLD, parallel%requests(2)) 
 
     ! Send to right, receive from left
-    call mpi_irecv(field0%data(:,0), field0%nx+2, MPI_DOUBLE_PRECISION, &
+    call mpi_irecv(field0%data(0,0), 1, parallel%columntype, &
 	parallel%nleft, 999, MPI_COMM_WORLD, parallel%requests(3))
 
-    call mpi_isend(field0%data(:,field0%ny), field0%nx+2, &
-	MPI_DOUBLE_PRECISION, parallel%nright, 999, MPI_COMM_WORLD, &
+    call mpi_isend(field0%data(0,field0%ny), 1, &
+	parallel%columntype, parallel%nright, 999, MPI_COMM_WORLD, &
 	parallel%requests(4))
+
+    ! Send to up, receive from down
+    call mpi_irecv(field0%data(field0%nx+1,0), 1, parallel%rowtype, &
+	parallel%ndown, 999, MPI_COMM_WORLD, parallel%requests(5)) 
+
+    call mpi_isend(field0%data(1,0), 1, parallel%rowtype, &
+	parallel%nup, 999, MPI_COMM_WORLD, parallel%requests(6)) 
+
+    ! Send to down, receive from up
+    call mpi_irecv(field0%data(0,0), 1, parallel%rowtype, &
+	parallel%nup, 999, MPI_COMM_WORLD, parallel%requests(7))
+
+    call mpi_isend(field0%data(field0%nx,0), 1, &
+	parallel%rowtype, parallel%ndown, 999, MPI_COMM_WORLD, &
+	parallel%requests(8))
 
     ! TODO end
 
@@ -42,10 +57,10 @@ contains
     implicit none
     type(parallel_data), intent(inout) :: parallel
     integer :: ierr
-    type(mpi_status) :: status(4) 
+    type(mpi_status) :: status(8) 
 
     ! TODO
-    call mpi_waitall(4, parallel%requests, status)
+    call mpi_waitall(8, parallel%requests, status)
 
   end subroutine exchange_finalize 
 
@@ -67,7 +82,7 @@ contains
 
     ! TODO
     do j = 2, ny-1
-       do i = 1, nx
+       do i = 2, nx-1
           curr%data(i, j) = prev%data(i, j) + a * dt * &
                & ((prev%data(i-1, j) - 2.0 * prev%data(i, j) + &
                &   prev%data(i+1, j)) / curr%dx**2 + &
@@ -97,6 +112,7 @@ contains
     ny = curr%ny
 
     ! TODO
+    ! left and right boundary
     do j = 1, ny, ny - 1
        do i = 1, nx
           curr%data(i, j) = prev%data(i, j) + a * dt * &
@@ -106,6 +122,18 @@ contains
                &   prev%data(i, j+1)) / curr%dy**2)
        end do
     end do
+
+    ! upper and lower boundary
+    do j = 1, ny
+       do i = 1, nx, nx - 1
+          curr%data(i, j) = prev%data(i, j) + a * dt * &
+               & ((prev%data(i-1, j) - 2.0 * prev%data(i, j) + &
+               &   prev%data(i+1, j)) / curr%dx**2 + &
+               &  (prev%data(i, j-1) - 2.0 * prev%data(i, j) + &
+               &   prev%data(i, j+1)) / curr%dy**2)
+       end do
+    end do
+
 
   end subroutine evolve_edges
 

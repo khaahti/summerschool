@@ -36,9 +36,36 @@ contains
 
   subroutine single_writer()
     implicit none
+    character(len=85) :: filename, format
 
     ! TODO: Implement a function that writers the whole array of elements
     !       to a file so that single process is responsible for the file io
+    call mpi_gather(localvector, localsize, mpi_integer, fullvector, &
+	& localsize, mpi_integer, writer_id, mpi_comm_world, rc)
+    if (my_id == 0) then
+!       do i=1, ntasks - 1
+!           call mpi_recv(fullvector(i*localsize+1:(i+1)*localsize), &
+!		localsize, MPI_INTEGER, i, 10, MPI_COMM_WORLD, &
+!		MPI_STATUS_IGNORE, rc)
+!       end do
+       
+       open(10, file='singlewriter.dat', status='replace', form='formatted', &
+		& access='stream')       
+       write(10,'(64(I0,1x))') fullvector
+       write(output_unit,'(A,I0,A)') 'Wrote ', size(fullvector), &
+		' elements to file singlewriter.dat'
+       close(10)
+!    else
+!       write(*,*) my_id, localvector
+!       call mpi_send(localvector, localsize, MPI_INTEGER, 0, 10, &
+!	    MPI_COMM_WORLD, rc)
+    end if
+
+    write(filename, '(A,I0,A)') 'writer_rank', my_id, '.dat'
+    write(format, '(A,I0,A)') '(', localsize, '(I0,1x))'
+    open(11, file=filename, status='replace', form='formatted', &
+		& access='stream')       
+    write(11,format) localvector    
 
   end subroutine single_writer
 

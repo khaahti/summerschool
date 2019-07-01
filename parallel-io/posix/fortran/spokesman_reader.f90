@@ -41,6 +41,15 @@ contains
 
     ! TODO: Implement a function that will read the data from a file so that
     !       a single process does the file io. Use rank WRITER_ID as the io rank
+    if (my_id==0) then
+        open(10, file="singlewriter.dat", status='old')
+        read(10,*) fullvector
+        write (*,*) fullvector
+    end if
+
+    call mpi_scatter(fullvector,localsize,MPI_INTEGER,localvector,localsize,&
+	MPI_INTEGER, 0, MPI_COMM_WORLD, rc)
+
 
   end subroutine single_reader
 

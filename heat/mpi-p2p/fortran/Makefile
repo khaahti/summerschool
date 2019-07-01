@@ -16,7 +16,7 @@ endif
 ifeq ($(COMP),gnu)
 FC=mpif90
 CC=gcc
-FCFLAGS=-O3 -Wall 
+FCFLAGS=-O3 -Wall all -qopenmp
 CCFLAGS=-O3 -Wall -I$(COMMONDIR)
 LDFLAGS=
 LIBS=-lpng

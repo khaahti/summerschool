@@ -18,6 +18,7 @@ program heat_solve
   integer, parameter :: image_interval = 100 ! Image output interval
 
   type(parallel_data) :: parallelization
+  integer :: provided, required=MPI_THREAD_FUNNELED
   integer :: ierr
 
   integer :: iter
@@ -25,7 +26,7 @@ program heat_solve
   real(kind=dp) :: start, stop ! Timers
 
   ! TODO start: initialize MPI
-  call mpi_init(ierr)
+  call mpi_init_thread(required, provided, ierr)
   ! TODO end
 
   call initialize(current, previous, nsteps, parallelization)

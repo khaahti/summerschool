@@ -37,13 +37,20 @@ contains
     implicit none
     integer :: rc, dsize
     type(mpi_file) :: fh
-    integer(kind=MPI_OFFSET_KIND) :: offset;
+    integer(kind=MPI_OFFSET_KIND) :: offset
 
     call mpi_type_size(MPI_INTEGER, dsize, rc)
 
     ! TODO: write the output file "mpiio.dat" using MPI IO. Each
     !       rank should write their own local vectors to correct
     !       locations in the output file.
+
+    call mpi_file_open(MPI_COMM_WORLD, "mpiio.dat", &
+	MPI_MODE_CREATE+MPI_MODE_WRONLY, MPI_INFO_NULL, fh, rc)
+    call mpi_type_size(MPI_INTEGER, dsize, rc)
+    offset = dsize * my_id * localsize
+    call mpi_file_write_at(fh,offset,localvector, localsize, &
+	MPI_INTEGER, MPI_STATUS_IGNORE, rc)
 
   end subroutine mpiio_writer
 

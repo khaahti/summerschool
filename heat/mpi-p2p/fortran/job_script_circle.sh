@@ -7,4 +7,4 @@
 #SBATCH -t 5
 #SBATCH --reservation=Summerschool
 
-aprun -e MPICH_MAX_THREAD_SAFETY=multiple -e OMP_NUM_THREADS=4 -n 4 -d 4 heat_mpi bottle.dat 1000
+aprun -e MPICH_MAX_THREAD_SAFETY=multiple -e OMP_NUM_THREADS=4 -n 4 -d 4 heat_mpi

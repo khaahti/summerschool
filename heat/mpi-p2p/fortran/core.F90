@@ -7,6 +7,7 @@ contains
   ! Exchange the boundary data between MPI tasks
   subroutine exchange(field0, parallel)
     use mpi_f08
+    use omp_lib
 
     implicit none
 
@@ -14,22 +15,31 @@ contains
     type(parallel_data), intent(in) :: parallel
     type(mpi_status) :: status
 
-    integer :: ierr
+    integer :: ierr, tid
+
+    !$omp parallel private(tid)
+
+    tid = omp_get_thread_num() + 1
 
     ! TODO start: implement halo exchange
     ! Send to left, receive from right 
-    call mpi_sendrecv(field0%data(:,1), field0%nx+2, MPI_DOUBLE_PRECISION, &
+    call mpi_sendrecv(field0%data(field0%displs(tid):field0%displs(tid+1)-1,1), & 
+	field0%displs(tid+1)-field0%displs(tid), MPI_DOUBLE_PRECISION, &
 	parallel%nleft, 999, &
-	field0%data(:,field0%ny+1),field0%nx+2, MPI_DOUBLE_PRECISION, &
-	parallel%nright, 999, MPI_COMM_WORLD, status, ierr) 
+	field0%data(field0%displs(tid):field0%displs(tid+1)-1,field0%ny+1), &
+	field0%displs(tid+1)-field0%displs(tid), MPI_DOUBLE_PRECISION, &
+	parallel%nright, 999, parallel%tcomm(tid), status, ierr) 
 
     ! Send to right, receive from left
-    call mpi_sendrecv(field0%data(:,field0%ny), field0%nx+2, &
-	MPI_DOUBLE_PRECISION, &
-	parallel%nright, 999, field0%data(:,0), &
-	field0%nx+2, MPI_DOUBLE_PRECISION, parallel%nleft, 999, &	
-	MPI_COMM_WORLD, status, ierr)
+    call mpi_sendrecv(field0%data(field0%displs(tid):field0%displs(tid+1)-1,field0%ny), &
+	field0%displs(tid+1)-field0%displs(tid), MPI_DOUBLE_PRECISION, &
+	parallel%nright, 999, & 
+	field0%data(field0%displs(tid):field0%displs(tid+1)-1,0), &
+	field0%displs(tid+1)-field0%displs(tid), MPI_DOUBLE_PRECISION, &
+	parallel%nleft, 999, parallel%tcomm(tid), status, ierr)
     ! TODO end
+    
+    !$omp end parallel
 
   end subroutine exchange
 
@@ -41,7 +51,6 @@ contains
   !   dt (real(dp)): time step value
   subroutine evolve(curr, prev, a, dt)
 
-    use omp_lib
     implicit none
 
     type(field), intent(inout) :: curr, prev

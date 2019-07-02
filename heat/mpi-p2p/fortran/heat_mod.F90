@@ -1,6 +1,7 @@
 ! Field metadata for heat equation solver
 module heat
   use iso_fortran_env, only : REAL64
+  use mpi_f08
   implicit none
 
   integer, parameter :: dp = REAL64
@@ -14,12 +15,14 @@ module heat
      real(dp) :: dx
      real(dp) :: dy
      real(dp), dimension(:,:), allocatable :: data
+     integer, allocatable :: displs(:)
   end type field
 
   type :: parallel_data
      integer :: size
      integer :: rank
      integer :: nleft, nright  ! Ranks of neighbouring MPI tasks
+     type(mpi_comm), allocatable :: tcomm(:)
   end type parallel_data
 
 contains

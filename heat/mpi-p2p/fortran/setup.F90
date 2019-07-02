@@ -7,6 +7,7 @@ contains
   subroutine initialize(previous, current, nsteps, parallel)
     use utilities
     use io
+    use omp_lib
 
     implicit none
 

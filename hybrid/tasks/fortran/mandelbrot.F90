@@ -25,7 +25,6 @@ program mandelbrot
 
   allocate(iter_counts(w, h))
 
-
   t0 = omp_get_wtime()
 
   cmin = (-1.5, -1.0)
@@ -34,7 +33,13 @@ program mandelbrot
   ! TODO create parallel region. How many threads should be calling
   ! mandelbrot_block in this uppermost level?
 
+  !$omp parallel
+  !$omp single
+
   call mandelbrot_block(iter_counts, w, h, cmin, cmax, 0, 0, w, 1)
+
+  !$omp end single
+  !$omp end parallel
 
   t1 = omp_get_wtime()
 
@@ -81,9 +86,11 @@ contains
        ! Subdivide recursively
        do i=0, subdiv - 1
           do j=0, subdiv - 1
+             !$omp task
              call mandelbrot_block(iter_counts, w, h, cmin, cmax, &
                   x0 + i*block_size, y0 + j*block_size, &
                   block_size, depth + 1)
+             !$omp end task
           end do
        end do
     else

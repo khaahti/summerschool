@@ -20,8 +20,33 @@ program vectorsum
   ! TODO
   ! Implement vector addition on device with OpenACC
   ! vecC = vecA + vecB
-
+  do i = 1, nx
+     vecC(i) = vecA(i) + vecB(i)
+  end do
   ! Compute the check value
   write(*,*) 'Reduction sum: ', sum(vecC)
+
+  ! TODO
+  ! Implement vector addition on device with OpenACC
+  ! vecC = vecA + vecB
+  !$acc parallel loop
+    do i = 1, nx
+       vecC(i) = vecA(i) + vecB(i)
+    end do
+  !$acc end parallel loop
+  ! Compute the check value
+  write(*,*) 'Reduction sum parallel: ', sum(vecC)
+
+  ! TODO
+  ! Implement vector addition on device with OpenACC
+  ! vecC = vecA + vecB
+  !$acc kernels loop
+    do i = 1, nx
+       vecC(i) = vecA(i) + vecB(i)
+    end do
+  !$acc end kernels loop
+  ! Compute the check value
+  write(*,*) 'Reduction sum kernels: ', sum(vecC)
+
 
 end program vectorsum

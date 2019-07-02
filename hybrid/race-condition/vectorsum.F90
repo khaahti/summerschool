@@ -1,5 +1,6 @@
 program vectorsum
   use iso_fortran_env, only: int64
+  use omp_lib
   implicit none
   integer, parameter :: ik = int64
   integer(kind=ik), parameter :: nx = 102400_ik
@@ -18,8 +19,10 @@ program vectorsum
 
   sum = 0
   ! TODO: Parallelize the computation
+  !$omp parallel do shared(vecA) private(i) reduction(+:sum)
   do i = 1, nx
      sum = sum + vecA(i)
   end do
+  !$omp end parallel do
   write(*,*) 'Sum: ', sum
 end program vectorsum

@@ -78,6 +78,7 @@ contains
     nx = curr%nx
     ny = curr%ny
 
+    !$omp parallel do private(i,j)
     ! TODO
     do j = 2, ny-1
        do i = 2, nx-1
@@ -88,6 +89,7 @@ contains
                &   prev%data(i, j+1)) / curr%dy**2)
        end do
     end do
+    !$omp end parallel do
 
   end subroutine evolve_interior
 
@@ -110,6 +112,7 @@ contains
     ny = curr%ny
 
     ! TODO
+    !$omp parallel do private(i,j)
     ! left and right boundary
     do j = 1, ny, ny - 1
        do i = 1, nx
@@ -120,7 +123,9 @@ contains
                &   prev%data(i, j+1)) / curr%dy**2)
        end do
     end do
-
+    !$omp end parallel do
+    
+    !$omp parallel do private(i,j)    
     ! upper and lower boundary
     do j = 1, ny
        do i = 1, nx, nx - 1
@@ -131,6 +136,7 @@ contains
                &   prev%data(i, j+1)) / curr%dy**2)
        end do
     end do
+    !$omp end parallel do
 
   end subroutine evolve_edges
 

@@ -17,6 +17,7 @@ program heat_solve
   integer :: nsteps       ! Number of time steps
   integer, parameter :: image_interval = 100 ! Image output interval
 
+  integer :: provided, required=MPI_THREAD_FUNNELED
   type(parallel_data) :: parallelization
   integer :: ierr
 
@@ -24,7 +25,15 @@ program heat_solve
 
   real(kind=dp) :: start, stop ! Timers
 
-  call mpi_init(ierr)
+  ! TODO start: initialize MPI
+  call mpi_init_thread(required, provided, ierr)
+  ! TODO end
+  ! check
+  if (provided == required) then
+    write(*,*) 'Provided thread support matches required one'
+  else
+    write(*,*) 'Provided thread support does not match required one!'
+  end if
 
   call initialize(current, previous, nsteps, parallelization)
 
